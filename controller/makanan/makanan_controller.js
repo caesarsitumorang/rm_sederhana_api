@@ -30,24 +30,23 @@ exports.createMakanan = (req, res) => {
   });
 };
 
-exports.getAllMakanan = (req, res) => {
-  makananModels.getAllMakanan((err, results) => {
-    if (err) {
-      console.error('DB ERROR:', err); // 👉 Tambahkan baris ini untuk lihat error detail
-      return res.status(500).json({
-        messages: 'Gagal mengambil data makanan',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllMakanan = async (req, res) => {
+  try {
+    const results = await makananModels.getAllMakanan();
     res.json({
       messages: 'Berhasil mengambil data makanan',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({
+      messages: 'Gagal mengambil data makanan',
+      data: null,
+      status: false
+    });
+  }
 };
-
 
 exports.getMakananById = (req, res) => {
   const id = req.params.id;

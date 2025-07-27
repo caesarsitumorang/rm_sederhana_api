@@ -22,14 +22,16 @@ exports.createMakanan = (data, callback) => {
 
 // Ambil semua makanan
 exports.getAllMakanan = (callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err, null);
-    connection.query('SELECT * FROM makanan', (err, results) => {
+  (async () => {
+    try {
+      const connection = await db.getConnection();
+      const [results] = await connection.query('SELECT * FROM makanan');
       connection.release();
-      if (err) return callback(err, null);
       callback(null, results);
-    });
-  });
+    } catch (err) {
+      callback(err, null);
+    }
+  })();
 };
 
 // Ambil makanan by id
