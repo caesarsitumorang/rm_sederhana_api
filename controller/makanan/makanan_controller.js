@@ -33,6 +33,7 @@ exports.createMakanan = (req, res) => {
 exports.getAllMakanan = (req, res) => {
   makananModels.getAllMakanan((err, results) => {
     if (err) {
+      console.error('DB ERROR:', err); // 👉 Tambahkan baris ini untuk lihat error detail
       return res.status(500).json({
         messages: 'Gagal mengambil data makanan',
         data: null,
@@ -46,6 +47,7 @@ exports.getAllMakanan = (req, res) => {
     });
   });
 };
+
 
 exports.getMakananById = (req, res) => {
   const id = req.params.id;
