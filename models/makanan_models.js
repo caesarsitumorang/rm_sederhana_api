@@ -21,16 +21,14 @@ exports.createMakanan = (data, callback) => {
 };
 
 // Ambil semua makanan
-exports.getAllMakanan = (callback) => {
-  db.query('SELECT * FROM makanan', (err, results) => {
-    if (err) {
-      console.error('Error fetching makanan:', err);
-      return callback(err, null);
-    }
-    callback(null, results);
-  });
+exports.getAllMakanan = async () => {
+  try {
+    const [rows] = await db.query('SELECT * FROM makanan');
+    return rows;
+  } catch (error) {
+    throw new Error('Error fetching makanan: ' + error.message);
+  }
 };
-
 // Ambil makanan by id
 exports.getMakananById = (id, callback) => {
   db.query('SELECT * FROM makanan WHERE id = ?', [id], (err, results) => {
