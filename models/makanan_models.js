@@ -22,12 +22,13 @@ exports.createMakanan = (data, callback) => {
 
 // Ambil semua makanan
 exports.getAllMakanan = (callback) => {
-  db.query('SELECT * FROM makanan', (err, results) => {
-    if (err) {
-      console.error('Error fetching makanan:', err);
-      return callback(err, null);
-    }
-    callback(null, results);
+  db.getConnection((err, connection) => {
+    if (err) return callback(err, null);
+    connection.query('SELECT * FROM makanan', (err, results) => {
+      connection.release();
+      if (err) return callback(err, null);
+      callback(null, results);
+    });
   });
 };
 
