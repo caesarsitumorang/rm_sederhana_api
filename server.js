@@ -22,7 +22,6 @@ const adminRoutes = require('./routes/admin_routes');
 const warungRoutes = require('./routes/warung_routes');
 const penjualanRoutes = require('./routes/penjual_routes');
 
-
 // API Routes
 app.use('/api', pelangganRoutes);
 app.use('/api', loginRoutes);

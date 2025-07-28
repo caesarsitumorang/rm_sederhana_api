@@ -1,11 +1,25 @@
 const makananModels = require('../../models/makanan_models');
+const { put } = require('@vercel/blob');
 
 exports.createMakanan = async (req, res) => {
   const { nama, deskripsi, harga, kategori, stok } = req.body || {};
   let gambar = null;
+
   if (req.file) {
-    gambar = req.file.filename;
+    try {
+      const blob = await put(req.file.originalname, req.file.buffer, {
+        access: 'public'
+      });
+      gambar = blob.url; // ✅ gunakan URL dari Vercel Blob
+    } catch (err) {
+      return res.status(500).json({
+        messages: 'Gagal upload gambar',
+        data: null,
+        status: false
+      });
+    }
   }
+
   if (!nama || !harga || !kategori) {
     return res.status(400).json({
       messages: 'Nama, harga, dan kategori wajib diisi',
@@ -13,7 +27,9 @@ exports.createMakanan = async (req, res) => {
       status: false
     });
   }
+
   const data = { nama, deskripsi, harga, kategori, stok, gambar };
+
   try {
     const result = await makananModels.createMakanan(data);
     res.json({
@@ -29,6 +45,7 @@ exports.createMakanan = async (req, res) => {
     });
   }
 };
+
 
 exports.getAllMakanan = async (req, res) => {
   try {
@@ -76,9 +93,22 @@ exports.getMakananById = async (req, res) => {
 exports.editMakanan = async (req, res) => {
   const id = req.params.id;
   let data = { ...req.body };
+
   if (req.file) {
-    data.gambar = req.file.filename;
+    try {
+      const blob = await put(req.file.originalname, req.file.buffer, {
+        access: 'public'
+      });
+      data.gambar = blob.url; // ✅ simpan URL gambar
+    } catch (err) {
+      return res.status(500).json({
+        messages: 'Gagal upload gambar',
+        data: null,
+        status: false
+      });
+    }
   }
+
   try {
     const result = await makananModels.editMakanan(id, data);
     if (result.affectedRows > 0) {
@@ -102,6 +132,7 @@ exports.editMakanan = async (req, res) => {
     });
   }
 };
+
 
 exports.deleteMakanan = async (req, res) => {
   const id = req.params.id;
