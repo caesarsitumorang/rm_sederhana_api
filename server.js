@@ -5,8 +5,6 @@ const formidable = require('formidable');
 const fs = require('fs/promises');
 require('dotenv').config(); // agar .env bisa dibaca
 
-const { put } = require('@vercel/blob'); // sekarang ini akan pakai token dari .env
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
