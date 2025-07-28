@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'rahasia_super_aman';
 
-exports.loginPenjual = (req, res) => {
+exports.loginPenjual = async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) {
     return res.status(400).json({
@@ -12,14 +12,8 @@ exports.loginPenjual = (req, res) => {
       status: false
     });
   }
-  db.query('SELECT * FROM penjual WHERE username = ?', [username], async (err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Terjadi kesalahan pada server',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const [results] = await db.query('SELECT * FROM penjual WHERE username = ?', [username]);
     if (results.length === 0) {
       return res.status(401).json({
         messages: 'Username tidak ditemukan',
@@ -36,20 +30,21 @@ exports.loginPenjual = (req, res) => {
         status: false
       });
     }
-    // Jangan kirim password ke client
     delete user.password;
-
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id, username: user.username },JWT_SECRET, {
-      expiresIn: '7d', // token berlaku selama 7 hari
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
+      expiresIn: '7d',
     });
-
     res.json({
       messages: 'Anda berhasil login',
       data: user,
       token: token,
       status: true
     });
-  });
-}
-
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Terjadi kesalahan pada server',
+      data: null,
+      status: false
+    });
+  }
+};
