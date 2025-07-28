@@ -13,56 +13,42 @@ exports.createAdmin = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const data = { username, password: hashedPassword, nama_lengkap, email };
-    adminModels.createAdmin(data, (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          messages: 'Gagal menambah admin',
-          data: null,
-          status: false
-        });
-      }
-      res.json({
-        messages: 'Berhasil menambah admin',
-        data: result,
-        status: true
-      });
+    const result = await adminModels.createAdmin(data);
+    res.json({
+      messages: 'Berhasil menambah admin',
+      data: result,
+      status: true
     });
   } catch (error) {
     return res.status(500).json({
-      messages: 'Gagal hash password',
+      messages: 'Gagal menambah admin',
       data: null,
       status: false
     });
   }
 };
 
-exports.getAllAdmin = (req, res) => {
-  adminModels.getAllAdmin((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data admin',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllAdmin = async (req, res) => {
+  try {
+    const results = await adminModels.getAllAdmin();
     res.json({
       messages: 'Berhasil mengambil data admin',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    return res.status(500).json({
+      messages: 'Gagal mengambil data admin',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getAdminById = (req, res) => {
+exports.getAdminById = async (req, res) => {
   const id = req.params.id;
-  adminModels.getAdminById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data admin',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await adminModels.getAdminById(id);
     if (result) {
       res.json({
         messages: 'Berhasil mengambil data admin',
@@ -76,7 +62,13 @@ exports.getAdminById = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    return res.status(500).json({
+      messages: 'Gagal mengambil data admin',
+      data: null,
+      status: false
+    });
+  }
 };
 
 exports.editAdmin = async (req, res) => {
@@ -93,14 +85,8 @@ exports.editAdmin = async (req, res) => {
       });
     }
   }
-  adminModels.editAdmin(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data admin',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await adminModels.editAdmin(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data admin',
@@ -114,19 +100,19 @@ exports.editAdmin = async (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    return res.status(500).json({
+      messages: 'Gagal mengedit data admin',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deleteAdmin = (req, res) => {
+exports.deleteAdmin = async (req, res) => {
   const id = req.params.id;
-  adminModels.deleteAdmin(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data admin',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await adminModels.deleteAdmin(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data admin',
@@ -140,5 +126,11 @@ exports.deleteAdmin = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    return res.status(500).json({
+      messages: 'Gagal menghapus data admin',
+      data: null,
+      status: false
+    });
+  }
 };

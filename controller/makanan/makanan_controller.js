@@ -1,6 +1,6 @@
 const makananModels = require('../../models/makanan_models');
 
-exports.createMakanan = (req, res) => {
+exports.createMakanan = async (req, res) => {
   const { nama, deskripsi, harga, kategori, stok } = req.body || {};
   let gambar = null;
   if (req.file) {
@@ -14,20 +14,20 @@ exports.createMakanan = (req, res) => {
     });
   }
   const data = { nama, deskripsi, harga, kategori, stok, gambar };
-  makananModels.createMakanan(data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menambah makanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await makananModels.createMakanan(data);
     res.json({
       messages: 'Berhasil menambah makanan',
       data: result,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menambah makanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
 exports.getAllMakanan = async (req, res) => {
@@ -39,7 +39,6 @@ exports.getAllMakanan = async (req, res) => {
       status: true
     });
   } catch (err) {
-    console.error('Error:', err);
     res.status(500).json({
       messages: 'Gagal mengambil data makanan',
       data: null,
@@ -48,16 +47,10 @@ exports.getAllMakanan = async (req, res) => {
   }
 };
 
-exports.getMakananById = (req, res) => {
+exports.getMakananById = async (req, res) => {
   const id = req.params.id;
-  makananModels.getMakananById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data makanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await makananModels.getMakananById(id);
     if (result) {
       res.json({
         messages: 'Berhasil mengambil data makanan',
@@ -71,23 +64,23 @@ exports.getMakananById = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data makanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.editMakanan = (req, res) => {
+exports.editMakanan = async (req, res) => {
   const id = req.params.id;
   let data = { ...req.body };
   if (req.file) {
     data.gambar = req.file.filename;
   }
-  makananModels.editMakanan(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data makanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await makananModels.editMakanan(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data makanan',
@@ -101,19 +94,19 @@ exports.editMakanan = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengedit data makanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deleteMakanan = (req, res) => {
+exports.deleteMakanan = async (req, res) => {
   const id = req.params.id;
-  makananModels.deleteMakanan(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data makanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await makananModels.deleteMakanan(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data makanan',
@@ -127,5 +120,11 @@ exports.deleteMakanan = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menghapus data makanan',
+      data: null,
+      status: false
+    });
+  }
 };

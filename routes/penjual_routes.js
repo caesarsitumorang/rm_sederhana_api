@@ -5,7 +5,7 @@ const { verifyToken } = require('../auth/authMiddleware');
 
 router.post('/create-penjual', penjualController.createPenjual);
 router.get('/penjual', penjualController.getAllPenjual);
-router.get('/profile-penjual', verifyToken, penjualController.getPenjualByid);
+router.get('/profile-penjual', verifyToken, penjualController.getPenjualById);
 router.put('/edit-penjual/:id', penjualController.editPenjual);
 router.delete('/delete-penjual/:id', penjualController.deletePenjual);
 

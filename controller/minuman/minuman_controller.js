@@ -1,6 +1,6 @@
 const minumanModels = require('../../models/minuman_models');
 
-exports.createMinuman = (req, res) => {
+exports.createMinuman = async (req, res) => {
   const { nama, deskripsi, harga, ukuran, stok } = req.body || {};
   let gambar = null;
   if (req.file) {
@@ -14,49 +14,43 @@ exports.createMinuman = (req, res) => {
     });
   }
   const data = { nama, deskripsi, harga, ukuran, stok, gambar };
-  minumanModels.createMinuman(data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menambah minuman',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await minumanModels.createMinuman(data);
     res.json({
       messages: 'Berhasil menambah minuman',
       data: result,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menambah minuman',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getAllMinuman = (req, res) => {
-  minumanModels.getAllMinuman((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data minuman',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllMinuman = async (req, res) => {
+  try {
+    const results = await minumanModels.getAllMinuman();
     res.json({
       messages: 'Berhasil mengambil data minuman',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data minuman',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getMinumanById = (req, res) => {
+exports.getMinumanById = async (req, res) => {
   const id = req.params.id;
-  minumanModels.getMinumanById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data minuman',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await minumanModels.getMinumanById(id);
     if (result) {
       res.json({
         messages: 'Berhasil mengambil data minuman',
@@ -70,23 +64,23 @@ exports.getMinumanById = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data minuman',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.editMinuman = (req, res) => {
+exports.editMinuman = async (req, res) => {
   const id = req.params.id;
   let data = { ...req.body };
   if (req.file) {
     data.gambar = req.file.filename;
   }
-  minumanModels.editMinuman(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data minuman',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await minumanModels.editMinuman(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data minuman',
@@ -100,19 +94,19 @@ exports.editMinuman = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengedit data minuman',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deleteMinuman = (req, res) => {
+exports.deleteMinuman = async (req, res) => {
   const id = req.params.id;
-  minumanModels.deleteMinuman(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data minuman',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await minumanModels.deleteMinuman(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data minuman',
@@ -126,5 +120,11 @@ exports.deleteMinuman = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menghapus data minuman',
+      data: null,
+      status: false
+    });
+  }
 };

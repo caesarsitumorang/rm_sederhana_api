@@ -1,11 +1,12 @@
 const db = require('../db/config');
 
-exports.createWarung = (data, callback) => {
+// Tambah warung
+exports.createWarung = async (data) => {
   const query = `INSERT INTO info_warung (
     nama_warung, pemilik, no_hp, email, alamat, deskripsi,
     nama_bank_warung, nomor_rekening_warung, jam_buka, jam_tutup,
-    latitude, longitude, foto_profil
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    latitude, longitude, foto_profil, detail_alamat
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
     data.nama_warung,
     data.pemilik || null,
@@ -19,37 +20,64 @@ exports.createWarung = (data, callback) => {
     data.jam_tutup || null,
     data.latitude || null,
     data.longitude || null,
-    data.foto_profil || null
+    data.foto_profil || null,
+    data.detail_alamat || null
   ];
-  db.query(query, values, callback);
+  try {
+    const [result] = await db.query(query, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.getAllWarung = (callback) => {
-  db.query('SELECT * FROM info_warung', callback);
+// Ambil semua warung
+exports.getAllWarung = async () => {
+  try {
+    const [results] = await db.query('SELECT * FROM info_warung');
+    return results;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.getWarungById = (id, callback) => {
-  db.query('SELECT * FROM info_warung WHERE id = ?', [id], (err, results) => {
-    if (err) return callback(err, null);
-    callback(null, results[0] || null);
-  });
+// Ambil warung by id
+exports.getWarungById = async (id) => {
+  try {
+    const [results] = await db.query('SELECT * FROM info_warung WHERE id = ?', [id]);
+    return results[0] || null;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.editWarung = (id, data, callback) => {
-  const fields = [];
-  const values = [];
-  Object.keys(data).forEach(key => {
-    if (data[key] !== undefined) {
-      fields.push(`${key} = ?`);
-      values.push(data[key]);
-    }
-  });
-  if (fields.length === 0) return callback(null, { affectedRows: 0 });
-  const query = `UPDATE info_warung SET ${fields.join(', ')} WHERE id = ?`;
-  values.push(id);
-  db.query(query, values, callback);
+// Edit warung
+exports.editWarung = async (id, data) => {
+  try {
+    const fields = [];
+    const values = [];
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        values.push(data[key]);
+      }
+    });
+    if (fields.length === 0) return { affectedRows: 0 };
+    const query = `UPDATE info_warung SET ${fields.join(', ')} WHERE id = ?`;
+    values.push(id);
+    const [result] = await db.query(query, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.deleteWarung = (id, callback) => {
-  db.query('DELETE FROM info_warung WHERE id = ?', [id], callback);
+// Hapus warung
+exports.deleteWarung = async (id) => {
+  try {
+    const [result] = await db.query('DELETE FROM info_warung WHERE id = ?', [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };

@@ -1,6 +1,6 @@
 const warungModels = require('../../models/warung_models');
 
-exports.createWarung = (req, res) => {
+exports.createWarung = async (req, res) => {
   const data = { ...req.body };
   if (req.file) data.foto_profil = req.file.filename;
   if (!data.nama_warung) {
@@ -10,49 +10,43 @@ exports.createWarung = (req, res) => {
       status: false
     });
   }
-  warungModels.createWarung(data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menambah warung',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await warungModels.createWarung(data);
     res.json({
       messages: 'Berhasil menambah warung',
       data: result,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menambah warung',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getAllWarung = (req, res) => {
-  warungModels.getAllWarung((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data warung',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllWarung = async (req, res) => {
+  try {
+    const results = await warungModels.getAllWarung();
     res.json({
       messages: 'Berhasil mengambil data warung',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data warung',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getWarungById = (req, res) => {
+exports.getWarungById = async (req, res) => {
   const id = req.params.id;
-  warungModels.getWarungById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data warung',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await warungModels.getWarungById(id);
     if (result) {
       res.json({
         messages: 'Berhasil mengambil data warung',
@@ -66,21 +60,21 @@ exports.getWarungById = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data warung',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.editWarung = (req, res) => {
+exports.editWarung = async (req, res) => {
   const id = req.params.id;
   const data = { ...req.body };
   if (req.file) data.foto_profil = req.file.filename;
-  warungModels.editWarung(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data warung',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await warungModels.editWarung(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data warung',
@@ -94,19 +88,19 @@ exports.editWarung = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengedit data warung',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deleteWarung = (req, res) => {
+exports.deleteWarung = async (req, res) => {
   const id = req.params.id;
-  warungModels.deleteWarung(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data warung',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await warungModels.deleteWarung(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data warung',
@@ -120,5 +114,11 @@ exports.deleteWarung = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menghapus data warung',
+      data: null,
+      status: false
+    });
+  }
 };

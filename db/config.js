@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
 
 const db = mysql.createPool({
-  host:'103.163.138.21',
-  user:'tempakod_caesar',
-  password:'caesarsitumorang',
-  database:'tempakod_db_rm_sederhana',
+  host:'localhost',
+  user:'root',
+  password:'',
+  database:'db_rm_sederhana',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

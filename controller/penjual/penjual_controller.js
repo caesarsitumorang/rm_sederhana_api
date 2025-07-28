@@ -13,59 +13,45 @@ exports.createPenjual = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const data = { nama, email, no_hp, jenis_kelamin, username, password: hashedPassword, alamat };
-    penjualModels.createPenjual(data, (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          messages: 'Gagal menambah penjual',
-          data: null,
-          status: false
-        });
-      }
-      res.json({
-        messages: 'Berhasil menambah penjual',
-        data: result,
-        status: true
-      });
+    const result = await penjualModels.createPenjual(data);
+    res.json({
+      messages: 'Berhasil menambah penjual',
+      data: result,
+      status: true
     });
   } catch (error) {
     res.status(500).json({
-      messages: 'Gagal hash password',
+      messages: 'Gagal menambah penjual',
       data: null,
       status: false
     });
   }
 };
 
-exports.getAllPenjual = (req, res) => {
-  penjualModels.getAllPenjual((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data penjual',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllPenjual = async (req, res) => {
+  try {
+    const results = await penjualModels.getAllPenjual();
     res.json({
       messages: 'Berhasil mengambil data penjual',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data penjual',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getPenjualByid = (req, res) => {
-   const { id } = req.user; // Ambil dari token
-  penjualModels.getPenjualById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data penjual',
-        data: null,
-        status: false
-      });
-    }
+exports.getPenjualById = async (req, res) => {
+  const id = req.params.id || (req.user && req.user.id);
+  try {
+    const result = await penjualModels.getPenjualById(id);
     if (result) {
       res.json({
-        messages: 'Berhasil mengambil data penjual ',
+        messages: 'Berhasil mengambil data penjual',
         data: result,
         status: true
       });
@@ -76,8 +62,14 @@ exports.getPenjualByid = (req, res) => {
         status: false
       });
     }
-  });
-}
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data penjual',
+      data: null,
+      status: false
+    });
+  }
+};
 
 exports.editPenjual = async (req, res) => {
   const id = req.params.id;
@@ -93,14 +85,8 @@ exports.editPenjual = async (req, res) => {
       });
     }
   }
-  penjualModels.editPenjual(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data penjual',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await penjualModels.editPenjual(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data penjual',
@@ -114,19 +100,19 @@ exports.editPenjual = async (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengedit data penjual',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deletePenjual = (req, res) => {
+exports.deletePenjual = async (req, res) => {
   const id = req.params.id;
-  penjualModels.deletePenjual(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data penjual',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await penjualModels.deletePenjual(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data penjual',
@@ -140,5 +126,11 @@ exports.deletePenjual = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menghapus data penjual',
+      data: null,
+      status: false
+    });
+  }
 };

@@ -1,46 +1,73 @@
 const db = require('../db/config');
 
-exports.createPenjual = (data, callback) => {
-  const query = `INSERT INTO penjual (nama, email, no_hp, jenis_kelamin, username, password, alamat)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`;
-  const values = [
-    data.nama,
-    data.email,
-    data.no_hp,
-    data.jenis_kelamin,
-    data.username,
-    data.password,
-    data.alamat
-  ];
-  db.query(query, values, callback);
+// Tambah penjual
+exports.createPenjual = async (data) => {
+  try {
+    const query = `INSERT INTO penjual (nama, email, no_hp, jenis_kelamin, username, password, alamat)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [
+      data.nama,
+      data.email,
+      data.no_hp,
+      data.jenis_kelamin,
+      data.username,
+      data.password,
+      data.alamat
+    ];
+    const [result] = await db.query(query, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.getAllPenjual = (callback) => {
-  db.query('SELECT * FROM penjual', callback);
+// Ambil semua penjual
+exports.getAllPenjual = async () => {
+  try {
+    const [results] = await db.query('SELECT * FROM penjual');
+    return results;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.getPenjualById = (id, callback) => {
-  db.query('SELECT * FROM penjual WHERE id = ?', [id], (err, results) => {
-    if (err) return callback(err, null);
-    callback(null, results[0] || null);
-  });
+// Ambil penjual by id
+exports.getPenjualById = async (id) => {
+  try {
+    const [results] = await db.query('SELECT * FROM penjual WHERE id = ?', [id]);
+    return results[0] || null;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.editPenjual = (id, data, callback) => {
-  const fields = [];
-  const values = [];
-  Object.keys(data).forEach(key => {
-    if (data[key] !== undefined) {
-      fields.push(`${key} = ?`);
-      values.push(data[key]);
-    }
-  });
-  if (fields.length === 0) return callback(null, { affectedRows: 0 });
-  const query = `UPDATE penjual SET ${fields.join(', ')} WHERE id = ?`;
-  values.push(id);
-  db.query(query, values, callback);
+// Edit penjual
+exports.editPenjual = async (id, data) => {
+  try {
+    const fields = [];
+    const values = [];
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        values.push(data[key]);
+      }
+    });
+    if (fields.length === 0) return { affectedRows: 0 };
+    const query = `UPDATE penjual SET ${fields.join(', ')} WHERE id = ?`;
+    values.push(id);
+    const [result] = await db.query(query, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
-exports.deletePenjual = (id, callback) => {
-  db.query('DELETE FROM penjual WHERE id = ?', [id], callback);
+// Hapus penjual
+exports.deletePenjual = async (id) => {
+  try {
+    const [result] = await db.query('DELETE FROM penjual WHERE id = ?', [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };

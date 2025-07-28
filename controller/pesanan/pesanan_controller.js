@@ -1,6 +1,6 @@
 const pesananModels = require('../../models/pesanan_models');
 
-exports.createPesanan = (req, res) => {
+exports.createPesanan = async (req, res) => {
   const {
     id_pelanggan,
     tanggal_pesanan,
@@ -18,9 +18,6 @@ exports.createPesanan = (req, res) => {
   if (req.file) {
     bukti_pembayaran = req.file.filename;
   }
-  console.log('📥 Body yang diterima:', req.body);
-
-
   // Validasi
   if (!id_pelanggan || !total_harga) {
     return res.status(400).json({
@@ -29,7 +26,6 @@ exports.createPesanan = (req, res) => {
       status: false,
     });
   }
-
   if (!Array.isArray(detail) || detail.length === 0) {
     return res.status(400).json({
       messages: 'Minimal satu detail makanan atau minuman harus disertakan',
@@ -37,7 +33,6 @@ exports.createPesanan = (req, res) => {
       status: false,
     });
   }
-
   const data = {
     id_pelanggan,
     tanggal_pesanan,
@@ -49,53 +44,45 @@ exports.createPesanan = (req, res) => {
     latitude,
     longitude,
     detail_alamat,
-    detail, // ← kirim langsung ke model
+    detail,
   };
-
-  pesananModels.createPesanan(data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menambah pesanan',
-        data: null,
-        status: false,
-      });
-    }
+  try {
+    const result = await pesananModels.createPesanan(data);
     res.json({
       messages: 'Berhasil menambah pesanan',
       data: result,
       status: true,
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menambah pesanan',
+      data: null,
+      status: false,
+    });
+  }
 };
 
-
-exports.getAllPesanan = (req, res) => {
-  pesananModels.getAllPesanan((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data pesanan',
-        data: null,
-        status: false
-      });
-    }
+exports.getAllPesanan = async (req, res) => {
+  try {
+    const results = await pesananModels.getAllPesanan();
     res.json({
       messages: 'Berhasil mengambil data pesanan',
       data: results,
       status: true
     });
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data pesanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.getPesananById = (req, res) => {
+exports.getPesananById = async (req, res) => {
   const id = req.params.id;
-  pesananModels.getPesananById(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengambil data pesanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await pesananModels.getPesananById(id);
     if (result) {
       res.json({
         messages: 'Berhasil mengambil data pesanan',
@@ -109,23 +96,23 @@ exports.getPesananById = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengambil data pesanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.editPesanan = (req, res) => {
+exports.editPesanan = async (req, res) => {
   const id = req.params.id;
   let data = { ...req.body };
   if (req.file) {
     data.bukti_pembayaran = req.file.filename;
   }
-  pesananModels.editPesanan(id, data, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal mengedit data pesanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await pesananModels.editPesanan(id, data);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil mengedit data pesanan',
@@ -139,19 +126,19 @@ exports.editPesanan = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal mengedit data pesanan',
+      data: null,
+      status: false
+    });
+  }
 };
 
-exports.deletePesanan = (req, res) => {
+exports.deletePesanan = async (req, res) => {
   const id = req.params.id;
-  pesananModels.deletePesanan(id, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        messages: 'Gagal menghapus data pesanan',
-        data: null,
-        status: false
-      });
-    }
+  try {
+    const result = await pesananModels.deletePesanan(id);
     if (result.affectedRows > 0) {
       res.json({
         messages: 'Berhasil menghapus data pesanan',
@@ -165,5 +152,11 @@ exports.deletePesanan = (req, res) => {
         status: false
       });
     }
-  });
+  } catch (err) {
+    res.status(500).json({
+      messages: 'Gagal menghapus data pesanan',
+      data: null,
+      status: false
+    });
+  }
 };
