@@ -21,10 +21,10 @@ const adminRoutes = require('./routes/admin_routes');
 const warungRoutes = require('./routes/warung_routes');
 const penjualanRoutes = require('./routes/penjual_routes');
 
-// Static file (jika tetap butuh)
+// Static file (jika tetap butuh untuk menampilkan file lokal)
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
-// API routes
+// API Routes
 app.use('/api', pelangganRoutes);
 app.use('/api', loginRoutes);
 app.use('/api', makananRoutes);
@@ -34,19 +34,26 @@ app.use('/api', adminRoutes);
 app.use('/api', warungRoutes);
 app.use('/api', penjualanRoutes);
 
-// Upload route to Vercel Blob
+// ✅ Upload Route (Vercel-compatible)
 app.post('/api/upload', (req, res) => {
-  const form = formidable({ multiples: false });
+  const form = formidable({
+    multiples: false,
+    uploadDir: '/tmp',          // ✅ folder writable di Vercel
+    keepExtensions: true        // agar .jpg, .png tetap ada
+  });
 
   form.parse(req, async (err, fields, files) => {
-    if (err) return res.status(500).json({ error: 'Gagal memproses form upload' });
+    if (err) {
+      console.error('Formidable error:', err);
+      return res.status(500).json({ error: 'Gagal memproses form upload' });
+    }
 
     try {
       const file = files.file;
       const buffer = await fs.readFile(file.filepath);
 
       const blob = await put(file.originalFilename, buffer, {
-        access: 'public', // bisa juga 'private' kalau perlu
+        access: 'public', // atau 'private' jika perlu
       });
 
       res.status(200).json({ url: blob.url });
