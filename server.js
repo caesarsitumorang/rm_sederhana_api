@@ -22,8 +22,6 @@ const adminRoutes = require('./routes/admin_routes');
 const warungRoutes = require('./routes/warung_routes');
 const penjualanRoutes = require('./routes/penjual_routes');
 
-// Static file (jika tetap butuh untuk menampilkan file lokal)
-app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 // API Routes
 app.use('/api', pelangganRoutes);
